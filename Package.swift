@@ -26,7 +26,8 @@ let package = Package(
         ),
         .testTarget(
             name: "CalibrexTests",
-            dependencies: ["CalibrexCore"]
+            dependencies: ["CalibrexCore"],
+            path: "Tests/CalibrexTests"
         )
     ]
 )
