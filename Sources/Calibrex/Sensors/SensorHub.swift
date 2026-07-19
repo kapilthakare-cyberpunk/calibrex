@@ -3,16 +3,29 @@ import Foundation
 /// Reads ambient environmental signals from sensors
 class SensorHub {
     
+    private let ambientSensor = AmbientLightSensor()
+    private var sensorOpened = false
+    
+    init() {
+        // Try to open ambient light sensor on init
+        sensorOpened = ambientSensor.open()
+        if sensorOpened {
+            print("[SensorHub] Ambient light sensor opened successfully")
+        } else {
+            print("[SensorHub] Ambient light sensor not available, using fallbacks")
+        }
+    }
+    
     /// Read ambient light level in lux
     func readLux() async -> Double {
-        // Priority: USB sensor > MacBook built-in sensor > estimation
+        // Priority: MacBook built-in sensor > USB sensor > estimation
+        
+        if sensorOpened, let lux = ambientSensor.readLux() {
+            return lux
+        }
         
         if let usbLux = await readUSBLux() {
             return usbLux
-        }
-        
-        if let iokitLux = readIOKitLux() {
-            return iokitLux
         }
         
         // Fallback: estimate from time of day
@@ -44,18 +57,6 @@ class SensorHub {
         }
         
         return 22.0 // Default room temperature assumption
-    }
-    
-    // MARK: - IOKit Ambient Light Sensor (MacBook)
-    
-    private func readIOKitLux() -> Double? {
-        // IOKit HID query for Apple's ambient light sensor
-        // Available on MacBooks since ~2008
-        // Returns raw value that needs conversion to lux
-        
-        // TODO: Implement IOKit HID device enumeration
-        // Uses IOServiceMatching("IOHIDDevice") with vendor/product IDs
-        return nil
     }
     
     // MARK: - USB Sensor Bridge
