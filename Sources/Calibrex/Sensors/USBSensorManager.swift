@@ -1,6 +1,6 @@
 import Foundation
 
-/// Manages USB-connected ambient sensors
+/// Manages USB-connected ambient sensors with hot-plug detection
 /// Auto-detects and reads from TSL2591, BH1750, and temperature sensors
 class USBSensorManager {
     
@@ -9,6 +9,11 @@ class USBSensorManager {
     private var tempSensor: USBBridgeConfig.TempSensor?
     
     private var connectedSensors: [String: ConnectedSensor] = [:]
+    private let hotplugDetector = USBHotplugDetector()
+    private var isMonitoring = false
+    
+    /// Callback when sensors change
+    var onSensorsChanged: (([ConnectedSensor]) -> Void)?
     
     struct ConnectedSensor {
         let name: String
@@ -21,6 +26,78 @@ class USBSensorManager {
         case bh1750
         case dht22
         case ds18b20
+    }
+    
+    // MARK: - Hot-plug Monitoring
+    
+    /// Start monitoring for USB connect/disconnect events
+    func startMonitoring() {
+        guard !isMonitoring else { return }
+        
+        hotplugDetector.onDeviceConnected = { [weak self] device in
+            self?.handleDeviceConnected(device)
+        }
+        
+        hotplugDetector.onDeviceDisconnected = { [weak self] device in
+            self?.handleDeviceDisconnected(device)
+        }
+        
+        if hotplugDetector.startMonitoring() {
+            isMonitoring = true
+            print("[USBManager] Hot-plug monitoring started")
+        }
+    }
+    
+    /// Stop monitoring for USB events
+    func stopMonitoring() {
+        hotplugDetector.stopMonitoring()
+        isMonitoring = false
+        print("[USBManager] Hot-plug monitoring stopped")
+    }
+    
+    private func handleDeviceConnected(_ device: USBHotplugDetector.USBDevice) {
+        print("[USBManager] Device connected: \(device.name)")
+        
+        // Try to connect to the new device
+        _ = scanAndConnect()
+        
+        // Notify listeners
+        DispatchQueue.main.async {
+            self.onSensorsChanged?(Array(self.connectedSensors.values))
+        }
+    }
+    
+    private func handleDeviceDisconnected(_ device: USBHotplugDetector.USBDevice) {
+        print("[USBManager] Device disconnected: \(device.name)")
+        
+        // Check if it was a connected sensor
+        for (key, sensor) in connectedSensors {
+            if sensor.port.contains(String(device.vendorId, radix: 16)) ||
+               sensor.name.lowercased().contains(device.name.lowercased()) {
+                disconnectSensor(key: key)
+                break
+            }
+        }
+        
+        // Notify listeners
+        DispatchQueue.main.async {
+            self.onSensorsChanged?(Array(self.connectedSensors.values))
+        }
+    }
+    
+    private func disconnectSensor(key: String) {
+        switch key {
+        case "tsl2591":
+            tsl2591?.disconnect()
+            tsl2591 = nil
+        case "bh1750":
+            bh1750?.disconnect()
+            bh1750 = nil
+        default:
+            break
+        }
+        connectedSensors.removeValue(forKey: key)
+        print("[USBManager] Disconnected sensor: \(key)")
     }
     
     /// Scan for and connect to available sensors
