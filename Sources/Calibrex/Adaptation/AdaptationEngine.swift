@@ -3,9 +3,22 @@ import Foundation
 /// Core adaptive engine that adjusts display based on ambient conditions
 class AdaptationEngine {
     
+    private let coreBrightness = CoreBrightnessClient()
     private var currentBrightness: Double = 1.0
     private var currentWhitePoint: Double = 6500 // Kelvin
     private var currentProfile: String = ""
+    
+    /// Initialize adaptation engine
+    func initialize() -> Bool {
+        let success = coreBrightness.initialize()
+        if success {
+            // Read current system state
+            currentBrightness = coreBrightness.getBrightness()
+            currentWhitePoint = coreBrightness.getNightShiftTemperature()
+            print("[Adaptation] Initialized - Brightness: \(Int(currentBrightness * 100))%, White Point: \(Int(currentWhitePoint))K")
+        }
+        return success
+    }
     
     /// Handle app focus change
     func handleAppChange(from oldApp: String, to newApp: String) async {
@@ -109,23 +122,19 @@ class AdaptationEngine {
     }
     
     private func applyBrightness(_ value: Double) {
-        // TODO: Apply brightness via CoreBrightness
-        // CBBlueLightClient or DisplayServices API
+        coreBrightness.setBrightness(value)
     }
     
     private func applyWhitePoint(_ kelvin: Double) {
-        // TODO: Apply white point via CoreBrightness
-        // Convert Kelvin to RGB adjustment values
+        coreBrightness.setNightShiftTemperature(kelvin)
     }
     
     private func setNightShift(_ enabled: Bool) async {
-        // TODO: Toggle Night Shift via CoreBrightness (CBBlueLightClient)
-        print("[Adaptation] Night Shift: \(enabled ? "ON" : "OFF")")
+        coreBrightness.setNightShift(enabled)
     }
     
     private func setTrueTone(_ enabled: Bool) async {
-        // TODO: Toggle True Tone via CoreBrightness (CBTrueToneClient)
-        print("[Adaptation] True Tone: \(enabled ? "ON" : "OFF")")
+        coreBrightness.setTrueTone(enabled)
     }
     
     // MARK: - Config Loading

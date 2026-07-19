@@ -18,6 +18,13 @@ struct CalibrexDaemon {
         // System detection on first run
         await systemDetector.detect()
         
+        // Initialize adaptation engine
+        let engineReady = adaptationEngine.initialize()
+        guard engineReady else {
+            print("[Calibrex] Failed to initialize CoreBrightness, exiting")
+            return
+        }
+        
         // Main daemon loop
         await runDaemonLoop(
             config: config,
