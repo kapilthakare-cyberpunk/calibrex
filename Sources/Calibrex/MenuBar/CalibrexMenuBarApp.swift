@@ -36,6 +36,7 @@ struct MenuBarView: View {
     
     @StateObject private var viewModel = MenuBarViewModel()
     @State private var showingSettings = false
+    @State private var showingCalibrationWizard = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -61,6 +62,9 @@ struct MenuBarView: View {
         .frame(width: 280)
         .onAppear {
             viewModel.refresh()
+        }
+        .sheet(isPresented: $showingCalibrationWizard) {
+            CalibrationWizardView()
         }
     }
     
@@ -161,7 +165,7 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 8) {
             // Calibrate button
             Button(action: {
-                viewModel.startCalibration()
+                showingCalibrationWizard = true
             }) {
                 Label("Calibrate Now", systemImage: "scope")
                     .frame(maxWidth: .infinity)
