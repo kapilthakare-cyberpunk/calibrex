@@ -11,14 +11,11 @@ struct CalibrexMenuBarApp: App {
         MenuBarExtra {
             MenuBarView()
         } label: {
-            Image(systemName: menuBarIcon)
+            Image("MenuBarIcon")
+                .resizable()
+                .frame(width: 18, height: 18)
         }
         .menuBarExtraStyle(.window)
-    }
-    
-    private var menuBarIcon: String {
-        // Dynamic icon based on status
-        return "circle.fill" // TODO: Update based on calibration state
     }
 }
 
