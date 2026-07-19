@@ -47,8 +47,21 @@ struct GeneralSettingsTab: View {
         Form {
             Section("Startup") {
                 Toggle("Launch at login", isOn: $viewModel.launchAtLogin)
-                Toggle("Show menu bar icon", isOn: $viewModel.showMenuBarIcon)
-                Toggle("Start adaptive mode on launch", isOn: $viewModel.startAdaptive)
+                    .onChange(of: viewModel.launchAtLogin) { _, newValue in
+                        viewModel.toggleLaunchAgent(enabled: newValue)
+                    }
+                
+                HStack {
+                    Text("Launch agent status")
+                    Spacer()
+                    Text(viewModel.launchAgentStatus)
+                        .foregroundColor(viewModel.launchAgentLoaded ? .green : .secondary)
+                }
+                
+                Button("Open Logs") {
+                    viewModel.openLaunchAgentLogs()
+                }
+                .controlSize(.small)
             }
             
             Section("Sensors") {
@@ -310,6 +323,10 @@ class SettingsViewModel: ObservableObject {
     @Published var colorTempThreshold: Double = 200
     @Published var argyllPath: String = "/usr/local/bin"
     
+    // Launch agent
+    @Published var launchAgentStatus: String = "Not installed"
+    @Published var launchAgentLoaded: Bool = false
+    
     struct AppRuleEntry {
         var nightShift: String
         var trueTone: String
@@ -317,9 +334,15 @@ class SettingsViewModel: ObservableObject {
     }
     
     private let configManager = ConfigurationManager()
+    private let launchAgentManager = LaunchAgentManager()
     
     func load() {
         let config = configManager.config
+        
+        // Launch agent status
+        let status = launchAgentManager.getStatus()
+        launchAgentStatus = status.description
+        launchAgentLoaded = (status == .loaded)
         
         // General
         launchAtLogin = config.daemon.launchAtLogin
@@ -392,5 +415,23 @@ class SettingsViewModel: ObservableObject {
     func removeAppRule(for bundleID: String) {
         appRules.removeValue(forKey: bundleID)
         configManager.removeAppRule(for: bundleID)
+    }
+    
+    // MARK: - Launch Agent
+    
+    func toggleLaunchAgent(enabled: Bool) {
+        if enabled {
+            let success = launchAgentManager.install()
+            launchAgentStatus = success ? "Loaded and running" : "Failed to install"
+            launchAgentLoaded = success
+        } else {
+            let success = launchAgentManager.uninstall()
+            launchAgentStatus = success ? "Not installed" : "Failed to uninstall"
+            launchAgentLoaded = false
+        }
+    }
+    
+    func openLaunchAgentLogs() {
+        launchAgentManager.openLogs()
     }
 }
