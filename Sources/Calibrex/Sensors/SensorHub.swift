@@ -3,12 +3,15 @@ import Foundation
 /// Reads ambient environmental signals from sensors
 class SensorHub {
     
-    private let ambientSensor = AmbientLightSensor()
+    private let ambientSensor: AmbientLightProtocol
     private let usbSensorManager = USBSensorManager()
     private var sensorOpened = false
     private var usbScanned = false
     
     init() {
+        // Use platform-specific sensor
+        ambientSensor = PlatformDetector.ambientLightSensor()
+        
         // Try to open ambient light sensor on init
         sensorOpened = ambientSensor.open()
         if sensorOpened {
