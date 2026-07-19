@@ -24,6 +24,7 @@ class MenuBarViewModel: ObservableObject {
     private let coreBrightness = CoreBrightnessClient()
     private let profileManager = ProfileManager()
     private let configManager = ConfigurationManager()
+    private let notificationManager = NotificationManager()
     
     private var isInitialized = false
     private var updateTimer: Timer?
@@ -107,16 +108,10 @@ class MenuBarViewModel: ObservableObject {
     func startCalibration() {
         print("[MenuBar] Starting calibration...")
         
-        // Show calibration window or run in background
-        // For now, just log the action
-        
         Task {
             // TODO: Trigger full calibration workflow
-            // 1. Detect colorimeter
-            // 2. Generate targets
-            // 3. Run measurement
-            // 4. Generate profile
-            // 5. Apply profile
+            // For now, send notification
+            notificationManager.notifyCalibrationComplete(deltaE: 0, profileName: "Test")
         }
     }
     
@@ -125,9 +120,8 @@ class MenuBarViewModel: ObservableObject {
         
         Task {
             // TODO: Run spot check workflow
-            // 1. Read spot measurement
-            // 2. Verify against current profile
-            // 3. Report delta-E
+            // For now, send notification
+            notificationManager.notifyProfileVerification(deltaE: 1.5, quality: "Very Good")
         }
     }
     
