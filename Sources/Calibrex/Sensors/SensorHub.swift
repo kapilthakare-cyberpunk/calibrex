@@ -4,7 +4,9 @@ import Foundation
 class SensorHub {
     
     private let ambientSensor = AmbientLightSensor()
+    private let usbSensorManager = USBSensorManager()
     private var sensorOpened = false
+    private var usbScanned = false
     
     init() {
         // Try to open ambient light sensor on init
@@ -16,16 +18,30 @@ class SensorHub {
         }
     }
     
+    /// Scan for USB sensors (call once on startup)
+    func scanUSBSensors() {
+        guard !usbScanned else { return }
+        
+        let sensors = usbSensorManager.scanAndConnect()
+        usbScanned = true
+        
+        if sensors.isEmpty {
+            print("[SensorHub] No USB sensors found")
+        }
+    }
+    
     /// Read ambient light level in lux
     func readLux() async -> Double {
-        // Priority: MacBook built-in sensor > USB sensor > estimation
+        // Priority: USB sensor > MacBook built-in sensor > estimation
         
-        if sensorOpened, let lux = ambientSensor.readLux() {
+        // Try USB sensor first (more accurate)
+        if usbSensorManager.hasLightSensor, let lux = usbSensorManager.readLux() {
             return lux
         }
         
-        if let usbLux = await readUSBLux() {
-            return usbLux
+        // Try MacBook built-in sensor
+        if sensorOpened, let lux = ambientSensor.readLux() {
+            return lux
         }
         
         // Fallback: estimate from time of day
@@ -34,10 +50,11 @@ class SensorHub {
     
     /// Read ambient color temperature in Kelvin
     func readColorTemp() async -> Double {
-        // Priority: USB sensor > calculation from RGB ambient > time-based estimation
+        // Priority: USB sensor (TSL2591) > calculation > time-based estimation
         
-        if let usbTemp = await readUSBColorTemp() {
-            return usbTemp
+        // TSL2591 can calculate color temperature from IR/Visible ratio
+        if let temp = usbSensorManager.readColorTemp() {
+            return temp
         }
         
         // Estimate from time of day (sunrise: 2000K, noon: 6500K, sunset: 2000K)
@@ -48,8 +65,8 @@ class SensorHub {
     func readTemperature() async -> Double {
         // Priority: USB sensor > SMC sensors > estimate
         
-        if let usbTemp = await readUSBTemp() {
-            return usbTemp
+        if let temp = usbSensorManager.readTemperature() {
+            return temp
         }
         
         if let smcTemp = readSMCTemperature() {
@@ -57,31 +74,6 @@ class SensorHub {
         }
         
         return 22.0 // Default room temperature assumption
-    }
-    
-    // MARK: - USB Sensor Bridge
-    
-    private func readUSBLux() async -> Double? {
-        // TSL2591 or BH1750 sensor via Arduino/ESP32 bridge
-        // Communicates over serial/USB
-        
-        // TODO: Implement USB serial communication
-        return nil
-    }
-    
-    private func readUSBColorTemp() async -> Double? {
-        // TSL2591 provides IR + Visible + Lux
-        // Color temp can be calculated from spectrum data
-        
-        // TODO: Implement USB sensor reading
-        return nil
-    }
-    
-    private func readUSBTemp() async -> Double? {
-        // DHT22 or DS18B20 temperature sensor via Arduino bridge
-        
-        // TODO: Implement USB temperature reading
-        return nil
     }
     
     // MARK: - SMC Temperature Sensors (Mac)
@@ -92,6 +84,16 @@ class SensorHub {
         
         // TODO: Implement SMC temperature reading
         return nil
+    }
+    
+    // MARK: - Cleanup
+    
+    func disconnectAll() {
+        usbSensorManager.disconnectAll()
+        if sensorOpened {
+            ambientSensor.close()
+            sensorOpened = false
+        }
     }
     
     // MARK: - Estimation Fallbacks
