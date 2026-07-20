@@ -7,7 +7,7 @@ class ArgyllCMS {
     private let argyllPath: String
     
     /// Initialize with path to ArgyllCMS binaries
-    init(argyllPath: String = "/usr/local/bin") {
+    init(argyllPath: String = "/opt/homebrew/bin") {
         self.argyllPath = argyllPath
     }
     
@@ -18,14 +18,15 @@ class ArgyllCMS {
         var devices: [ColorimeterDevice] = []
         
         // Use ArgyllCMS spotread to detect devices
-        let output = execute(tool: "spotread", args: ["-l"])
+        let output = execute(tool: "spotread", args: ["-v"])
         
-        // Parse output for device names
-        // Supported: Spyder 2/3/4/5, i1 Display Pro, i1 Pro, ColorMunki
+        // Parse output for device list
+        // Format: "1 = 'usb1: (Datacolor SpyderX2)'"
         for line in output.components(separatedBy: .newlines) {
             if line.contains("Spyder") || line.contains("i1") || line.contains("ColorMunki") {
-                let device = parseDeviceLine(line)
-                devices.append(device)
+                if let device = parseDeviceFromList(line) {
+                    devices.append(device)
+                }
             }
         }
         
@@ -37,8 +38,8 @@ class ArgyllCMS {
     /// Read current display color with colorimeter
     /// Returns measured RGB and white point
     func readDisplay(device: ColorimeterDevice) -> DisplayMeasurement? {
-        // spotread -d<device> -a reads the display
-        let output = execute(tool: "spotread", args: ["-d", device.id, "-a"])
+        // spotread -c <device_number> reads the display
+        let output = execute(tool: "spotread", args: ["-c", device.id, "-v"])
         
         guard !output.isEmpty else { return nil }
         
@@ -47,7 +48,7 @@ class ArgyllCMS {
     
     /// Read a single spot measurement
     func spotRead(device: ColorimeterDevice) -> (r: Double, g: Double, b: Double)? {
-        let output = execute(tool: "spotread", args: ["-d", device.id])
+        let output = execute(tool: "spotread", args: ["-c", device.id, "-v"])
         
         guard !output.isEmpty else { return nil }
         
@@ -188,15 +189,38 @@ class ArgyllCMS {
     
     // MARK: - Parsing Helpers
     
-    private func parseDeviceLine(_ line: String) -> ColorimeterDevice {
-        // Parse device info from ArgyllCMS output
-        let parts = line.components(separatedBy: " ")
-        let name = parts.first ?? "Unknown"
+    private func parseDeviceFromList(_ line: String) -> ColorimeterDevice? {
+        // Parse device from ArgyllCMS device list
+        // Format: "1 = 'usb1: (Datacolor SpyderX2)'"
+        guard line.contains("=") else { return nil }
+        
+        let parts = line.components(separatedBy: "=")
+        guard parts.count >= 2 else { return nil }
+        
+        let id = parts[0].trimmingCharacters(in: .whitespaces)
+        let deviceInfo = parts[1].trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: "'", with: "")
+            .replacingOccurrences(of: "(", with: "")
+            .replacingOccurrences(of: ")", with: "")
+        
+        // Determine device type
+        let type: ColorimeterType
+        if deviceInfo.contains("Spyder") {
+            type = .spyder
+        } else if deviceInfo.contains("i1 Display") {
+            type = .i1Display
+        } else if deviceInfo.contains("i1 Pro") {
+            type = .i1Pro
+        } else if deviceInfo.contains("ColorMunki") {
+            type = .colorMunki
+        } else {
+            return nil
+        }
         
         return ColorimeterDevice(
-            id: name.lowercased(),
-            name: name,
-            type: line.contains("Spyder") ? .spyder : .i1Display
+            id: id,
+            name: deviceInfo,
+            type: type
         )
     }
     
