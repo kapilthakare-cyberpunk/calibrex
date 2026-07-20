@@ -7,18 +7,26 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "calibrex", targets: ["Calibrex"])
+        .executable(name: "Calibrex", targets: ["Calibrex"]),
+        .library(name: "CalibrexCore", targets: ["CalibrexCore"])
     ],
     dependencies: [],
     targets: [
         .executableTarget(
             name: "Calibrex",
+            dependencies: ["CalibrexCore"],
+            path: "Sources/Calibrex",
+            exclude: ["Adaptation", "Calibration", "Core", "MenuBar", "Platform", "Profiles", "Sensors", "Utils"]
+        ),
+        .target(
+            name: "CalibrexCore",
             dependencies: [],
-            path: "Sources/Calibrex"
+            path: "Sources/Calibrex",
+            exclude: ["main.swift"]
         ),
         .testTarget(
             name: "CalibrexTests",
-            dependencies: ["Calibrex"],
+            dependencies: ["CalibrexCore"],
             path: "Tests/CalibrexTests"
         )
     ]

@@ -28,24 +28,12 @@ struct ContentView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Calibrex")
-                .font(.headline)
-            
-            Text("Adaptive Display Calibration")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            
+            Text("Calibrex").font(.headline)
+            Text("Adaptive Display Calibration").font(.caption).foregroundColor(.secondary)
             Divider()
-            
-            Button("Settings...") {
-                showingSettings = true
-            }
-            
+            Button("Settings...") { showingSettings = true }
             Divider()
-            
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
-            }
+            Button("Quit") { NSApplication.shared.terminate(nil) }
         }
         .padding()
         .frame(width: 250)
