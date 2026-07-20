@@ -47,8 +47,8 @@ struct GeneralSettingsTab: View {
         Form {
             Section("Startup") {
                 Toggle("Launch at login", isOn: $viewModel.launchAtLogin)
-                    .onChange(of: viewModel.launchAtLogin) { _, newValue in
-                        viewModel.toggleLaunchAgent(enabled: newValue)
+                    .onChange(of: viewModel.launchAtLogin) { value in
+                        viewModel.toggleLaunchAgent(enabled: value)
                     }
                 
                 HStack {
@@ -132,7 +132,7 @@ struct CalibrationSettingsTab: View {
                 if viewModel.autoCleanProfiles {
                     HStack {
                         Text("Keep last")
-                        TextField("", value: $viewModel.maxProfiles)
+                        TextField("", value: $viewModel.maxProfiles, format: .number)
                             .frame(width: 40)
                         Text("profiles")
                     }

@@ -205,7 +205,7 @@ class RecalibrationScheduler {
     
     // MARK: - State Persistence
     
-    private func stateFilePath: String {
+    private var stateFilePath: String {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         return appSupport.appendingPathComponent("Calibrex/recalibration_state.json").path
     }

@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 /// Workflow manager for calibration wizard
 @MainActor
@@ -218,10 +219,10 @@ class CalibrationWorkflow: ObservableObject {
         guard let targets = targetsDir else { return }
         
         isGeneratingProfile = true
+        let profileName = "calibrex_\(formatDate(Date()))"
         
-        Task.detached {
+        Task.detached { [profileName] in
             // Generate ICC profile
-            let profileName = "calibrex_\(self.formatDate(Date()))"
             
             guard let path = await self.argyll.generateProfile(
                 from: targets,

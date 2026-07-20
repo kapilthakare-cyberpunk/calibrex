@@ -1,0 +1,229 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/primary.swiftdeps"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Adaptation/AdaptationEngine.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AdaptationEngine.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AdaptationEngine.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AdaptationEngine~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AdaptationEngine.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AdaptationEngine.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Calibration/ArgyllCMS.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Calibration/RecalibrationScheduler.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/RecalibrationScheduler.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/RecalibrationScheduler.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/RecalibrationScheduler~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/RecalibrationScheduler.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/RecalibrationScheduler.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Core/ConfigurationManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ConfigurationManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ConfigurationManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ConfigurationManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ConfigurationManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ConfigurationManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Core/DaemonConfig.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/DaemonConfig.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/DaemonConfig.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/DaemonConfig~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/DaemonConfig.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/DaemonConfig.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Core/LaunchAgentManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LaunchAgentManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LaunchAgentManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LaunchAgentManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LaunchAgentManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LaunchAgentManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Core/NotificationManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/NotificationManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/NotificationManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/NotificationManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/NotificationManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/NotificationManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Core/SystemDetector.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SystemDetector.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SystemDetector.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SystemDetector~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SystemDetector.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SystemDetector.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/MenuBar/CalibrationWizardView.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWizardView.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWizardView.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWizardView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWizardView.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWizardView.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/MenuBar/CalibrationWorkflow.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWorkflow.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWorkflow.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWorkflow~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWorkflow.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrationWorkflow.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/MenuBar/CalibrexMenuBarApp.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrexMenuBarApp.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrexMenuBarApp.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrexMenuBarApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrexMenuBarApp.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CalibrexMenuBarApp.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/MenuBar/MenuBarViewModel.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/MenuBarViewModel.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/MenuBarViewModel.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/MenuBarViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/MenuBarViewModel.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/MenuBarViewModel.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/MenuBar/SettingsView.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SettingsView.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SettingsView.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SettingsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SettingsView.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SettingsView.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/Linux/LinuxAmbientLightSensor.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxAmbientLightSensor.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxAmbientLightSensor.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxAmbientLightSensor~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxAmbientLightSensor.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxAmbientLightSensor.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/Linux/LinuxColorProfileManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxColorProfileManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxColorProfileManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxColorProfileManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxColorProfileManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxColorProfileManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/Linux/LinuxDisplayController.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxDisplayController.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxDisplayController.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxDisplayController~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxDisplayController.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/LinuxDisplayController.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/PlatformDetector.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformDetector.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformDetector.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformDetector~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformDetector.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformDetector.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/PlatformProtocols.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformProtocols.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformProtocols.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformProtocols~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformProtocols.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/PlatformProtocols.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/Windows/WindowsAmbientLightSensor.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsAmbientLightSensor.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsAmbientLightSensor.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsAmbientLightSensor~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsAmbientLightSensor.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsAmbientLightSensor.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/Windows/WindowsColorProfileManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsColorProfileManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsColorProfileManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsColorProfileManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsColorProfileManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsColorProfileManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/Windows/WindowsDisplayController.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsDisplayController.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsDisplayController.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsDisplayController~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsDisplayController.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/WindowsDisplayController.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Platform/macOS/macOSPlatform.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/macOSPlatform.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/macOSPlatform.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/macOSPlatform~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/macOSPlatform.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/macOSPlatform.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Profiles/ProfileManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ProfileManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ProfileManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ProfileManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ProfileManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ProfileManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/AmbientLightSensor.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AmbientLightSensor.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AmbientLightSensor.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AmbientLightSensor~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AmbientLightSensor.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/AmbientLightSensor.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/BH1750Sensor.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/BH1750Sensor.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/BH1750Sensor.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/BH1750Sensor~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/BH1750Sensor.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/BH1750Sensor.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/SensorHub.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SensorHub.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SensorHub.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SensorHub~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SensorHub.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SensorHub.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/SerialCommunication.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SerialCommunication.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SerialCommunication.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SerialCommunication~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SerialCommunication.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/SerialCommunication.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/TSL2591Sensor.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/TSL2591Sensor.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/TSL2591Sensor.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/TSL2591Sensor~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/TSL2591Sensor.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/TSL2591Sensor.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/USBHotplugDetector.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBHotplugDetector.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBHotplugDetector.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBHotplugDetector~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBHotplugDetector.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBHotplugDetector.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Sensors/USBSensorManager.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBSensorManager.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBSensorManager.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBSensorManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBSensorManager.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/USBSensorManager.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/Utils/CoreBrightness.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CoreBrightness.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CoreBrightness.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CoreBrightness~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CoreBrightness.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/CoreBrightness.dia"
+  },
+  "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/main.swift": {
+    "dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main.d",
+    "object": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main.swift.o",
+    "swiftmodule": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main.swiftdeps",
+    "diagnostics": "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main.dia"
+  }
+}

@@ -6,7 +6,6 @@ class USBSensorManager {
     
     private var tsl2591: TSL2591Sensor?
     private var bh1750: BH1750Sensor?
-    private var tempSensor: USBBridgeConfig.TempSensor?
     
     private var connectedSensors: [String: ConnectedSensor] = [:]
     private let hotplugDetector = USBHotplugDetector()

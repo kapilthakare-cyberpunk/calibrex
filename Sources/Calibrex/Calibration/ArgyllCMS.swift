@@ -257,13 +257,21 @@ class ArgyllCMS {
 
 // MARK: - Types
 
-struct ColorimeterDevice {
+struct ColorimeterDevice: Hashable {
     let id: String
     let name: String
     let type: ColorimeterType
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: ColorimeterDevice, rhs: ColorimeterDevice) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
-enum ColorimeterType {
+enum ColorimeterType: Hashable {
     case spyder
     case i1Display
     case i1Pro

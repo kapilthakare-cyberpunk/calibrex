@@ -7,26 +7,18 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "calibrex", targets: ["Calibrex"]),
-        .library(name: "CalibrexCore", targets: ["CalibrexCore"])
+        .executable(name: "calibrex", targets: ["Calibrex"])
     ],
-    dependencies: [
-        // ArgyllCMS wrapper will be added
-    ],
+    dependencies: [],
     targets: [
         .executableTarget(
             name: "Calibrex",
-            dependencies: ["CalibrexCore"],
-            path: "Sources/Calibrex"
-        ),
-        .target(
-            name: "CalibrexCore",
             dependencies: [],
-            path: "Sources/Calibrex/Core"
+            path: "Sources/Calibrex"
         ),
         .testTarget(
             name: "CalibrexTests",
-            dependencies: ["CalibrexCore"],
+            dependencies: ["Calibrex"],
             path: "Tests/CalibrexTests"
         )
     ]

@@ -76,11 +76,13 @@ class USBHotplugDetector {
         }
         
         // Add to run loop
-        runLoopSource = IONotificationPortGetRunLoopSource(notificationPort)
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .defaultMode)
+        if let source = IONotificationPortGetRunLoopSource(notificationPort)?.takeUnretainedValue() {
+            runLoopSource = source
+            CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .defaultMode)
+        }
         
         // Set up matching for USB devices
-        let matching = IOServiceMatching(kIOUSBDeviceClassName)
+        let matching = IOServiceMatching("IOUSBDevice")
         
         // Watch for device additions
         let addResult = IOServiceAddMatchingNotification(
@@ -151,7 +153,7 @@ class USBHotplugDetector {
     
     // MARK: - Device Processing
     
-    private func processDeviceIterator(_ iterator: io_iterator_t) {
+    func processDeviceIterator(_ iterator: io_iterator_t) {
         var device = IOIteratorNext(iterator)
         
         while device != IO_OBJECT_NULL {
@@ -206,7 +208,7 @@ class USBHotplugDetector {
         }
     }
     
-    private func handleDeviceRemoval(_ device: io_service_t) {
+    func handleDeviceRemoval(_ device: io_service_t) {
         guard let properties = getDeviceProperties(device) else { return }
         
         let vendorId = properties.vendorId ?? 0
@@ -239,33 +241,24 @@ class USBHotplugDetector {
         var product: String?
         
         // Get vendor ID
-        var vendorRef: CFTypeRef?
-        if IORegistryEntryCreateCFProperty(device, kIOUSBDeviceVendorID as CFString, nil, 0).takeRetainedValue() != nil {
-            IORegistryEntryCreateCFProperty(device, kIOUSBDeviceVendorID as CFString, nil, 0)
-                .takeRetainedValue().withUnsafeBytes { raw in
-                    vendorId = raw.load(as: Int32.self)
-                }
+        if let vendorRef = IORegistryEntryCreateCFProperty(device, "idVendor" as CFString, nil, 0) {
+            vendorId = vendorRef.takeRetainedValue() as? Int
         }
         
         // Get product ID
-        if IORegistryEntryCreateCFProperty(device, kIOUSBDeviceProductID as CFString, nil, 0).takeRetainedValue() != nil {
-            IORegistryEntryCreateCFProperty(device, kIOUSBDeviceProductID as CFString, nil, 0)
-                .takeRetainedValue().withUnsafeBytes { raw in
-                    productId = raw.load(as: Int32.self)
-                }
+        if let productRef = IORegistryEntryCreateCFProperty(device, "idProduct" as CFString, nil, 0) {
+            productId = productRef.takeRetainedValue() as? Int
         }
         
         // Get product name
-        if let nameRef = IORegistryEntryCreateCFProperty(device, kIOUSBProduct as CFString, nil, 0) {
+        if let nameRef = IORegistryEntryCreateCFProperty(device, "USB Product Name" as CFString, nil, 0) {
             product = nameRef.takeRetainedValue() as? String
         }
         
         // Get path
-        var pathRef: Unmanaged<CFString>?
-        IORegistryEntryCreateCFProperty(device, "USB Port Path" as CFString, nil, 0)
-            .takeRetainedValue().withUnsafeBytes { raw in
-                path = String(cString: raw.bindMemory(to: CChar.self).baseAddress!)
-            }
+        if let pathRef = IORegistryEntryCreateCFProperty(device, "USB Port Path" as CFString, nil, 0) {
+            path = pathRef.takeRetainedValue() as? String
+        }
         
         guard vendorId != nil || productId != nil else {
             return nil
@@ -306,7 +299,7 @@ class USBHotplugDetector {
     
     private func isRelevantDevice(vendorId: Int, productId: Int) -> Bool {
         // Check if this is a known Arduino/ESP32 device
-        return knownVendorIds.keys.contains(vendorId)
+        return USBHotplugDetector.knownVendorIds.keys.contains(vendorId)
     }
     
     // MARK: - Public Accessors
@@ -317,7 +310,7 @@ class USBHotplugDetector {
     }
     
     /// Get connected devices of specific type
-    func getDevices ofType type: USBDeviceType) -> [USBDevice] {
+    func getDevices(ofType type: USBDeviceType) -> [USBDevice] {
         return knownDevices.values.filter { $0.type == type }
     }
     

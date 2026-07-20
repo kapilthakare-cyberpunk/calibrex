@@ -333,7 +333,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     
     /// Clear delivered notifications
     func clearDelivered() {
-        notificationCenter.removeAllDeliveredNotificationRequests()
+        notificationCenter.removeAllDeliveredNotifications()
     }
     
     // MARK: - Badge Management

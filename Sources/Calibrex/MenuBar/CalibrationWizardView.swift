@@ -168,11 +168,9 @@ struct ColorimeterStep: View {
                     workflow.scanColorimeters()
                 }
             } else {
-                Picker("Select colorimeter", selection: $workflow.selectedColorimeter) {
-                    Text("Select...").tag(nil as ColorimeterDevice?)
-                    ForEach(workflow.colorimeters, id: \.id) { device in
-                        Text("\(device.name) (\(device.type.description))").tag(device as ColorimeterDevice?)
-                    }
+                // Auto-select first device
+                Button("Use \(workflow.colorimeters[0].name)") {
+                    workflow.selectedColorimeter = workflow.colorimeters[0]
                 }
             }
             
@@ -240,7 +238,8 @@ struct MeasurementStep: View {
             if workflow.measurementState == .measuring {
                 ProgressView(value: workflow.measurementProgress) {
                     Text("Measuring...")
-                } progressViewStyle(.linear)
+                }
+                .progressViewStyle(.linear)
                 
                 Text("Display will show color patches automatically")
                     .foregroundColor(.secondary)
@@ -429,10 +428,4 @@ struct CompleteStep: View {
         }
         .padding()
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    CalibrationWizardView()
 }

@@ -143,27 +143,27 @@ class ProfileManager {
     
     // MARK: - Per-App Rules
     
-    private var perAppRules: [String: AppRule] = [:]
+    private var perAppRules: [String: ProfileAppRule] = [:]
     
     /// Load per-app rules from config
-    func loadPerAppRules() -> [String: AppRule] {
+    func loadPerAppRules() -> [String: ProfileAppRule] {
         // TODO: Load from JSON config file
         return [
-            "com.adobe.photoshop": AppRule(nightShift: "off", trueTone: "off"),
-            "com.apple.FinalCutPro": AppRule(nightShift: "off", trueTone: "off"),
-            "com.blackmagic-design.DaVinciResolve": AppRule(nightShift: "off", trueTone: "off")
+            "com.adobe.photoshop": ProfileAppRule(nightShift: "off", trueTone: "off"),
+            "com.apple.FinalCutPro": ProfileAppRule(nightShift: "off", trueTone: "off"),
+            "com.blackmagic-design.DaVinciResolve": ProfileAppRule(nightShift: "off", trueTone: "off")
         ]
     }
     
     /// Save per-app rules to config
-    func savePerAppRules(_ rules: [String: AppRule]) {
+    func savePerAppRules(_ rules: [String: ProfileAppRule]) {
         // TODO: Save to JSON config file
         perAppRules = rules
     }
     
     // MARK: - State Persistence
     
-    private func historyFilePath: String {
+    private var historyFilePath: String {
         return "\(profilesDirectory)/history.json"
     }
     
@@ -219,7 +219,7 @@ class ProfileManager {
     }
 }
 
-struct AppRule {
+struct ProfileAppRule {
     let nightShift: String // "on", "off", "default"
     let trueTone: String  // "on", "off", "default"
 }

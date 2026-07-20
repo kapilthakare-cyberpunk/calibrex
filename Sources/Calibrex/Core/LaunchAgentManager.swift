@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 /// Manages the launchd agent for Calibrex auto-start on login
 class LaunchAgentManager {
