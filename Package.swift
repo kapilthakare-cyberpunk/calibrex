@@ -14,7 +14,10 @@ let package = Package(
         .executableTarget(
             name: "Calibrex",
             dependencies: [],
-            path: "Sources/Calibrex"
+            path: "Sources/Calibrex",
+            swiftSettings: [
+                .unsafeFlags(["-parse-as-library"], .when(platforms: [.macOS]))
+            ]
         ),
         .testTarget(
             name: "CalibrexTests",

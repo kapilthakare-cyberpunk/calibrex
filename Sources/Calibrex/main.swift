@@ -92,6 +92,10 @@ struct CalibrationWizardSheet: View {
     @State private var isScanning = false
     @State private var isMeasuring = false
     @State private var progress: Double = 0
+    @State private var colorimeterDetected = false
+    @State private var scanError: String? = nil
+    
+    let argyllCMS = ArgyllCMS()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -127,11 +131,29 @@ struct CalibrationWizardSheet: View {
                     Text("Connect your Spyder X2 Ultra via USB and click Scan.").multilineTextAlignment(.center).foregroundColor(.secondary)
                     if isScanning {
                         ProgressView("Scanning...")
-                    } else {
+                    } else if colorimeterDetected {
                         Text("Spyder X2 Ultra detected").foregroundColor(.green)
                         Label("Device: Datacolor SpyderX2", systemImage: "checkmark.circle.fill").foregroundColor(.green)
+                    } else if let error = scanError {
+                        Text(error).foregroundColor(.red)
+                    } else {
+                        Text("Not connected").foregroundColor(.secondary)
                     }
-                    Button("Scan") { isScanning = true; DispatchQueue.main.asyncAfter(deadline: .now() + 2) { isScanning = false } }
+                    Button("Scan") {
+                        isScanning = true
+                        scanError = nil
+                        colorimeterDetected = false
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            let detected = argyllCMS.initializeColorimeter()
+                            DispatchQueue.main.async {
+                                isScanning = false
+                                colorimeterDetected = detected
+                                if !detected {
+                                    scanError = "Colorimeter not found. Please check USB connection."
+                                }
+                            }
+                        }
+                    }
                     
                 case 2: // Display
                     Image(systemName: "display").font(.system(size: 50)).foregroundColor(.accentColor)
