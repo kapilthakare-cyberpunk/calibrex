@@ -28,6 +28,10 @@
       "inputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/ArgyllCMS.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/main.swift"
         },
         {
@@ -43,6 +47,7 @@
       "moduleName" : "Calibrex",
       "moduleOutputPath" : "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Modules/Calibrex.swiftmodule",
       "objects" : [
+        "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.swift.o",
         "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main.swift.o"
       ],
       "otherArguments" : [
@@ -66,9 +71,9 @@
         "-entry-point-function-name",
         "-Xfrontend",
         "Calibrex_main",
-        "-parse-as-library",
         "-swift-version",
         "5",
+        "-parse-as-library",
         "-I",
         "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
         "-L",
@@ -93,6 +98,10 @@
       "outputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/main.swift.o"
         },
         {
@@ -102,6 +111,7 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
+        "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/ArgyllCMS.swift",
         "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/main.swift"
       ],
       "tempsPath" : "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build",
@@ -356,6 +366,7 @@
       "-package-name",
       "calibrex",
       "-c",
+      "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/ArgyllCMS.swift",
       "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/main.swift",
       "-I",
       "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Modules",
@@ -379,9 +390,9 @@
       "-entry-point-function-name",
       "-Xfrontend",
       "Calibrex_main",
-      "-parse-as-library",
       "-swift-version",
       "5",
+      "-parse-as-library",
       "-I",
       "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
       "-L",
@@ -575,6 +586,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/ArgyllCMS.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/kapilthakare/Projects/calibrex/Sources/Calibrex/main.swift"
         }
       ],
@@ -586,6 +601,10 @@
         {
           "kind" : "virtual",
           "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.swift.o"
         },
         {
           "kind" : "file",
@@ -614,6 +633,10 @@
         {
           "kind" : "virtual",
           "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kapilthakare/Projects/calibrex/.build/arm64-apple-macosx/debug/Calibrex.build/ArgyllCMS.swift.o"
         },
         {
           "kind" : "file",
