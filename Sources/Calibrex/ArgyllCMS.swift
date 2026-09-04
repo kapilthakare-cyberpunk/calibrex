@@ -20,6 +20,12 @@ class ArgyllCMS {
     
     func listDisplays() -> [String] {
         let output = run(toolPath("dispcal"), args: ["-l"])
+
+        if output.contains("Instrument Access Failed") {
+            print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security.")
+            return []
+        }
+
         return parseDisplayList(output)
     }
     
@@ -43,6 +49,12 @@ class ArgyllCMS {
             "-v",
             "-e"  // Exit after reading (don't display patches)
         ])
+
+        if result.contains("Instrument Access Failed") {
+            print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security.")
+            return false
+        }
+
         return result.contains("Instrument") || result.contains("reading")
     }
     
@@ -56,7 +68,7 @@ class ArgyllCMS {
             print("[ArgyllCMS] ERROR: Failed to initialize colorimeter")
             return false
         }
-        
+
         // Step 2: Run dispcal
         print("[ArgyllCMS] Running dispcal...")
         let result = run(toolPath("dispcal"), args: [
@@ -64,7 +76,12 @@ class ArgyllCMS {
             "-v",
             "-o", outputFile
         ])
-        
+
+        if result.contains("Instrument Access Failed") {
+            print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security, or run calibration through DisplayCAL.")
+            return false
+        }
+
         return result.contains("Done") || !result.contains("Error")
     }
     
