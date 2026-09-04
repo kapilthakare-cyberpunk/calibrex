@@ -43,41 +43,67 @@ class ArgyllCMS {
     
     /// Pre-initialize the colorimeter by running a brief dispread measurement.
     /// This wakes up the Spyder X2 Ultra so dispcal can detect it.
-    func initializeColorimeter(display: Int = 1) -> Bool {
+    func initializeColorimeter(display: Int = 1, port: Int = 1) -> Bool {
+        // Run a short, non-interactive read to wake up the colorimeter and verify
+        // access. `-Y p` skips the "place instrument" wait. dispread has no `-e`
+        // flag, so we point it at a throwaway per-display output file.
+        let probe = NSTemporaryDirectory() + "calibrex_probe_\(display).ti1"
         let result = run(toolPath("dispread"), args: [
             "-d\(display)",
+            "-c\(port)",
+            "-Y", "p",
             "-v",
-            "-e"  // Exit after reading (don't display patches)
+            probe
         ])
+        try? FileManager.default.removeItem(atPath: probe)
 
         if result.contains("Instrument Access Failed") {
             print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security.")
             return false
         }
 
-        return result.contains("Instrument") || result.contains("reading")
+        // dispread exits non-zero / reports when it can't open the instrument,
+        // even on a non-fatal read. Look for an explicit access failure message too.
+        if result.contains("new_disprd() failed") || result.contains("Instrument Access Failed") {
+            return false
+        }
+        return true
     }
     
     // MARK: - Calibration
     
     /// Run full calibration with pre-initialization
-    func calibrateDisplay(display: Int = 1, outputFile: String) -> Bool {
+    func calibrateDisplay(display: Int = 1, port: Int = 1,
+                          whiteTemp: Int = 5000, gamma: Double = 2.2,
+                          quality: String = "m", brightness: Int = 100,
+                          outputFile: String) -> Bool {
         // Step 1: Pre-initialize the colorimeter
         print("[ArgyllCMS] Initializing colorimeter...")
-        guard initializeColorimeter(display: display) else {
+        guard initializeColorimeter(display: display, port: port) else {
             print("[ArgyllCMS] ERROR: Failed to initialize colorimeter")
             return false
         }
 
-        // Step 2: Run dispcal
+        // Step 2: Run dispcal. dispcal takes a base output path (no extension) and
+        // writes <base>.cal and <base>.icc if -o is used. We intentionally skip -o
+        // here so a standalone .cal is produced without prematurely building a
+        // profile; pass each flag/value as SEPARATE argv entries (dispcal rejects
+        // tokens like "-q m" with a single-space value).
         print("[ArgyllCMS] Running dispcal...")
         let result = run(toolPath("dispcal"), args: [
-            "-d\(display)",
             "-v",
-            "-o", outputFile
+            "-d\(display)",
+            "-c\(port)",
+            "-y", "l",
+            "-q", quality,
+            "-t", "\(whiteTemp)",
+            "-g", "\(gamma)",
+            "-b", "\(brightness)",
+            "-Y", "p",
+            outputFile
         ])
 
-        if result.contains("Instrument Access Failed") {
+        if result.contains("Instrument Access Failed") || result.contains("new_disprd() failed") {
             print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security, or run calibration through DisplayCAL.")
             return false
         }
@@ -131,37 +157,95 @@ class ArgyllCMS {
     
     /// Take a single spot reading (for verification)
     func spotRead(display: Int = 1) -> (valid: Bool, x: Double, y: Double, Y: Double) {
-        let result = run(toolPath("spotread"), args: [
-            "-d\(display)",
-            "-v"
-        ])
-        
+        if printIfInstrumentError(run(toolPath("spotread"), args: ["-d\(display)", "-v"])) {
+            return (false, 0, 0, 0)
+        }
+        let result = run(toolPath("spotread"), args: ["-d\(display)", "-v"])
+
         // Parse spotread output for XYZ values
         return parseSpotRead(result)
     }
-    
+
+    /// Returns true (and prints a helpful message) if the supplied Argyll output
+    /// indicates the instrument could not be accessed.
+    private func printIfInstrumentError(_ output: String) -> Bool {
+        guard output.contains("Instrument Access Failed") || output.contains("new_disprd() failed") else {
+            return false
+        }
+        print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security.")
+        return true
+    }
+
     private func parseSpotRead(_ output: String) -> (valid: Bool, x: Double, y: Double, Y: Double) {
-        // Implementation depends on spotread output format
-        return (false, 0, 0, 0)
+        // Argyll spotread prints a line like:
+        //   X: 0.3127  Y: 0.3290  Z: 0.3582  ...
+        // plus XYZ_master / XYZ fields. We look for 'x:', 'y:' and 'Y:' tokens.
+        var x: Double?
+        var y: Double?
+        var Y: Double?
+
+        let words = output.split(whereSeparator: { $0 == " " || $0 == "\n" || $0 == "\r" || $0 == "\t" })
+        var i = 0
+        while i < words.count {
+            let w = String(words[i]).lowercased()
+            if (w == "x:" || w == "x") && i + 1 < words.count, x == nil {
+                x = Double(words[i + 1])
+                i += 1
+            } else if (w == "y:" || w == "y") && i + 1 < words.count, y == nil {
+                y = Double(words[i + 1])
+                i += 1
+            } else if (w == "y:" || w == "y") && i + 1 < words.count, Y == nil {
+                // Y (luminance) appears as a capital-Y field in the same listing.
+                Y = Double(words[i + 1])
+                i += 1
+            }
+            i += 1
+        }
+
+        guard let xv = x, let yv = y, let Yv = Y else {
+            return (false, 0, 0, 0)
+        }
+        return (true, xv, yv, Yv)
     }
     
     // MARK: - Utility
     
     private func run(_ command: String, args: [String]) -> String {
         let process = Process()
-        let pipe = Pipe()
-        
+        let outPipe = Pipe()
+        let errPipe = Pipe()
+
         process.executableURL = URL(fileURLWithPath: command)
         process.arguments = args
-        process.standardOutput = pipe
-        process.standardError = pipe
-        
+        process.standardOutput = outPipe
+        process.standardError = errPipe
+
         do {
             try process.run()
+
+            // Drain both pipes concurrently BEFORE waiting, otherwise a child that
+            // produces a lot of output can fill the pipe buffer and deadlock on
+            // waitUntilExit().
+            let outGroup = DispatchGroup()
+            var outData = Data()
+            outGroup.enter()
+            DispatchQueue.global().async {
+                outData = (try? outPipe.fileHandleForReading.readToEnd()) ?? Data()
+                outGroup.leave()
+            }
+            var errData = Data()
+            outGroup.enter()
+            DispatchQueue.global().async {
+                errData = (try? errPipe.fileHandleForReading.readToEnd()) ?? Data()
+                outGroup.leave()
+            }
+
             process.waitUntilExit()
-            
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            return String(data: data, encoding: .utf8) ?? ""
+            outGroup.wait()
+
+            let stdout = String(data: outData, encoding: .utf8) ?? ""
+            let stderr = String(data: errData, encoding: .utf8) ?? ""
+            return stdout.isEmpty ? stderr : stdout
         } catch {
             print("[ArgyllCMS] Error running \(command): \(error)")
             return ""
