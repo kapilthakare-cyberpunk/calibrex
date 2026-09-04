@@ -6,7 +6,7 @@ import Foundation
 class ArgyllCMS {
     private let argyllPath: String
     
-    init(argyllPath: String = "/opt/homebrew/bin") {
+    init(argyllPath: String = "\(NSHomeDirectory())/Library/Application Support/DisplayCAL/dl/Argyll_V3.5.0/bin") {
         self.argyllPath = argyllPath
     }
     
