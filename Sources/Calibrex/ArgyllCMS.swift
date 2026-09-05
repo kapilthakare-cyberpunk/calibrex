@@ -42,8 +42,30 @@ class ArgyllCMS {
 
     private let argyllPath: String
     
-    init(argyllPath: String = "\(NSHomeDirectory())/Library/Application Support/DisplayCAL/dl/Argyll_V3.5.0/bin") {
-        self.argyllPath = argyllPath
+    init(argyllPath: String? = nil) {
+        if let path = argyllPath {
+            self.argyllPath = path
+        } else {
+            self.argyllPath = Self.detectArgyllPath()
+        }
+        print("[ArgyllCMS] Using ArgyllCMS tools at: \(self.argyllPath)")
+    }
+    
+    /// Locates the ArgyllCMS binaries by checking known installation paths.
+    private static func detectArgyllPath() -> String {
+        let candidatePaths = [
+            "\(NSHomeDirectory())/Library/Application Support/DisplayCAL/dl/Argyll_V3.5.0/bin",
+            "/opt/homebrew/bin",
+            "/usr/local/bin",
+        ]
+        for path in candidatePaths {
+            let dispcal = "\(path)/dispcal"
+            if FileManager.default.isExecutableFile(atPath: dispcal) {
+                return path
+            }
+        }
+        // Fallback: prefer Homebrew arm64 path so error messages are actionable
+        return "/opt/homebrew/bin"
     }
     
     // MARK: - Baseline Capture
@@ -245,10 +267,11 @@ class ArgyllCMS {
     
     /// Take a single spot reading (for verification)
     func spotRead(display: Int = 1) -> (valid: Bool, x: Double, y: Double, Y: Double) {
-        if printIfInstrumentError(run(toolPath("spotread"), args: ["-d\(display)", "-v"])) {
+        let result = run(toolPath("spotread"), args: ["-d\(display)", "-v"])
+
+        if printIfInstrumentError(result) {
             return (false, 0, 0, 0)
         }
-        let result = run(toolPath("spotread"), args: ["-d\(display)", "-v"])
 
         // Parse spotread output for XYZ values
         return parseSpotRead(result)
@@ -267,7 +290,8 @@ class ArgyllCMS {
     private func parseSpotRead(_ output: String) -> (valid: Bool, x: Double, y: Double, Y: Double) {
         // Argyll spotread prints a line like:
         //   X: 0.3127  Y: 0.3290  Z: 0.3582  ...
-        // plus XYZ_master / XYZ fields. We look for 'x:', 'y:' and 'Y:' tokens.
+        // plus XYZ_master / XYZ fields. We look for 'X', 'y' and 'Y' tokens.
+        // Note: lowercase x/y are chromaticity coordinates; uppercase Y is luminance.
         var x: Double?
         var y: Double?
         var Y: Double?
@@ -276,13 +300,13 @@ class ArgyllCMS {
         var i = 0
         while i < words.count {
             let w = String(words[i]).lowercased()
-            if (w == "x:" || w == "x") && i + 1 < words.count, x == nil {
+            if w == "x:" && i + 1 < words.count, x == nil {
                 x = Double(words[i + 1])
                 i += 1
-            } else if (w == "y:" || w == "y") && i + 1 < words.count, y == nil {
+            } else if w == "y:" && i + 1 < words.count, y == nil {
                 y = Double(words[i + 1])
                 i += 1
-            } else if (w == "y:" || w == "y") && i + 1 < words.count, Y == nil {
+            } else if w == "y:" && i + 1 < words.count, Y == nil {
                 // Y (luminance) appears as a capital-Y field in the same listing.
                 Y = Double(words[i + 1])
                 i += 1
@@ -356,7 +380,7 @@ class ArgyllCMS {
 
         // Step 5: Export Profile
         print("[ArgyllCMS] Exporting profile...")
-        exportProfile(profilePath: profileName)
+        _ = exportProfile(profilePath: profileName)
 
         print("[ArgyllCMS] Full calibration flow completed successfully.")
         return true

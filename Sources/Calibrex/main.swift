@@ -29,7 +29,11 @@ struct MenuBarContent: View {
     @State private var currentColorTemp: Double = 6500
     @State private var currentBrightness: Double = 0.5
     @State private var lastDeltaE: Double = 0
-    
+
+    @StateObject private var displayManager = SystemDisplayManager()
+    private let argyllCMS = ArgyllCMS()
+    private let sensor = SensorBridge()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -39,7 +43,7 @@ struct MenuBarContent: View {
                     Text("Adaptive Display Calibration").font(.caption).foregroundColor(.secondary)
                 }
                 Spacer()
-                Text("v0.1.0").font(.caption2).foregroundColor(.secondary)
+                Text("v0.2.0").font(.caption2).foregroundColor(.secondary)
             }
             Divider()
             VStack(alignment: .leading, spacing: 8) {
@@ -52,16 +56,55 @@ struct MenuBarContent: View {
             }
             Divider()
             VStack(alignment: .leading, spacing: 8) {
-                Toggle(isOn: $nightShiftEnabled) { Label("Night Shift", systemImage: "moon.fill") }.toggleStyle(.switch)
-                Toggle(isOn: $trueToneEnabled) { Label("True Tone", systemImage: "sun.haze") }.toggleStyle(.switch)
-                Toggle(isOn: $adaptiveEnabled) { Label("Adaptive Mode", systemImage: "arrow.triangle.2.circlepath") }.toggleStyle(.switch)
+                Toggle(isOn: $nightShiftEnabled) {
+                    Label("Night Shift", systemImage: "moon.fill")
+                }
+                .toggleStyle(.switch)
+                .onChange(of: nightShiftEnabled) { newValue in
+                    let success = displayManager.setNightShift(enabled: newValue)
+                    if !success {
+                        // Revert the toggle if the system call failed
+                        DispatchQueue.main.async { nightShiftEnabled.toggle() }
+                    }
+                }
+
+                Toggle(isOn: $trueToneEnabled) {
+                    Label("True Tone", systemImage: "sun.haze")
+                }
+                .toggleStyle(.switch)
+                .onChange(of: trueToneEnabled) { newValue in
+                    let success = displayManager.setTrueTone(enabled: newValue)
+                    if !success {
+                        DispatchQueue.main.async { trueToneEnabled.toggle() }
+                    }
+                }
+
+                Toggle(isOn: $adaptiveEnabled) {
+                    Label("Adaptive Mode", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .toggleStyle(.switch)
+                .onChange(of: adaptiveEnabled) { newValue in
+                    // Adaptive mode orchestrates both Night Shift and True Tone
+                    displayManager.setNightShift(enabled: newValue)
+                    displayManager.setTrueTone(enabled: newValue)
+                }
             }
             Divider()
             VStack(alignment: .leading, spacing: 8) {
                 Button(action: { showingCalibrationWizard = true }) {
                     Label("Calibrate Now", systemImage: "scope").frame(maxWidth: .infinity)
                 }.controlSize(.regular)
-                Button(action: { lastDeltaE = 1.5 }) {
+                Button(action: {
+                    Task {
+                        let baseline = argyllCMS.captureBaselineStatus()
+                        let lux = sensor.readLux() ?? 0
+                        await MainActor.run {
+                            currentLux = lux
+                            currentColorTemp = baseline.whitePoint.y * 10000 // approximate
+                            lastDeltaE = baseline.deltaE
+                        }
+                    }
+                }) {
                     Label("Spot Check", systemImage: "checkmark.magnifyingglass").frame(maxWidth: .infinity)
                 }.controlSize(.small)
                 Button(action: { showingSettings = true }) { Label("Settings...", systemImage: "gear") }
@@ -69,6 +112,9 @@ struct MenuBarContent: View {
                 Button(action: { NSApplication.shared.terminate(nil) }) { Label("Quit Calibrex", systemImage: "power") }
             }
         }.padding().frame(width: 280)
+        .onAppear {
+            nightShiftEnabled = displayManager.isNightShiftEnabled()
+        }
         .sheet(isPresented: $showingSettings) { SettingsSheet() }
         .sheet(isPresented: $showingCalibrationWizard) { CalibrationWizardSheet() }
     }
@@ -94,6 +140,7 @@ struct CalibrationWizardSheet: View {
     @State private var progress: Double = 0
     @State private var colorimeterDetected = false
     @State private var scanError: String? = nil
+    @State private var preCalibrationBaseline: BaselineReport?
     
     let argyllCMS = ArgyllCMS()
     let sensor = SensorBridge()
@@ -171,8 +218,10 @@ struct CalibrationWizardSheet: View {
                             DispatchQueue.global(qos: .userInitiated).async {
                                 let baseline = argyllCMS.captureBaselineStatus()
                                 let report = baseline.formatted()
+                                print(report)
                                 DispatchQueue.main.async {
                                     isScanning = false
+                                    preCalibrationBaseline = baseline
                                     telegram.notifyStatus("Baseline captured. Delta-E: \(String(format: "%.2f", baseline.deltaE))")
                                     step = 3
                                 }
@@ -230,9 +279,20 @@ struct CalibrationWizardSheet: View {
                                     isMeasuring = false
                                     if success {
                                         DispatchQueue.global(qos: .userInitiated).async {
-                                            let pre = argyllCMS.captureBaselineStatus() // Note: In a real app, we'd store the actual pre-baseline
+                                            // Use the stored pre-baseline (captured in step 2)
+                                            let pre = preCalibrationBaseline ?? argyllCMS.captureBaselineStatus()
                                             let post = argyllCMS.captureBaselineStatus()
                                             let comparisonReport = argyllCMS.generateProfessionalReport(pre: pre, post: post)
+
+                                            // Also export the report to Desktop
+                                            let desktop = NSString(string: NSHomeDirectory()).appendingPathComponent("Desktop")
+                                            let reportPath = "\(desktop)/calibrex_comparison_report.txt"
+                                            do {
+                                                try comparisonReport.write(toFile: reportPath, atomically: true, encoding: .utf8)
+                                                print("[Calibrex] Comparison report saved to: \(reportPath)")
+                                            } catch {
+                                                print("[Calibrex] Error saving report: \(error)")
+                                            }
 
                                             DispatchQueue.main.async {
                                                 telegram.notifyCompletion(report: comparisonReport)

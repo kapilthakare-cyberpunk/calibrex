@@ -1,14 +1,14 @@
 #!/bin/bash
 
 echo "Building Calibrex..."
-cd /Users/kapilthakare/Projects/calibrex
+cd /Users/kapilthakare/calibrex
 
 # Try to build with swift build
 swift build 2>&1 | tail -20
 
 if [ $? -eq 0 ]; then
     echo "Build successful! Running Calibrex..."
-    swift run calibrex &
+    swift run Calibrex &
 else
     echo "Build failed. Please check the errors above."
     echo ""

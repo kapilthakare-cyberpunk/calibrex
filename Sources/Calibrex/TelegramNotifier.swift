@@ -47,7 +47,7 @@ class TelegramNotifier {
             if let error = error {
                 print("[TelegramNotifier] API Error: \(error)")
             } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
-                print("[TelegramNotifier] Server returned non-200 status: \((httpResponse as? HTTPURLResponse)?.statusCode ?? 0)")
+                print("[TelegramNotifier] Server returned non-200 status: \(httpResponse.statusCode)")
             }
         }
         task.resume()
