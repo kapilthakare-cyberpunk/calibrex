@@ -191,9 +191,27 @@ final class SystemDisplayManager: ObservableObject {
         return false
     }
 
-    /// Reads the current True Tone state.
+    /// Reads the current True Tone state from macOS preferences.
     func isTrueToneEnabled() -> Bool {
-        return false // No reliable user-space API to read True Tone state
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/defaults")
+        task.arguments = ["-currentHost", "read", "com.apple.CoreDisplay", "TrueToneEnabled"]
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = Pipe()
+
+        do {
+            try task.run()
+            task.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return output == "1" || output == "true"
+        } catch {
+            print("[SystemDisplayManager] Error reading True Tone state: \(error)")
+            return false
+        }
     }
 
     // MARK: - Ambient Light Compensation

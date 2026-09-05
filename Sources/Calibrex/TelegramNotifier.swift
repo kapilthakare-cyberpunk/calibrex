@@ -5,10 +5,16 @@ class TelegramNotifier {
     private let botToken: String
     private let chatId: String
     private let session = URLSession.shared
-
-    init(botToken: String = "8796627200:AAFLV0ch_mu1knw-PmgofV6A2VsRYP4dL3c", chatId: String = "7982368790") {
-        self.botToken = botToken
-        self.chatId = chatId
+    private let defaults = UserDefaults.standard
+    
+    private enum Keys: String {
+        case botToken = "calibrexTelegramBotToken"
+        case chatId = "calibrexTelegramChatId"
+    }
+    
+    init() {
+        self.botToken = defaults.string(forKey: Keys.botToken.rawValue) ?? "8796627200:AAFLV0ch_mu1knw-PmgofV6A2VsRYP4dL3c"
+        self.chatId = defaults.string(forKey: Keys.chatId.rawValue) ?? "7982368790"
     }
 
     /// Sends a simple text message to the configured chat.

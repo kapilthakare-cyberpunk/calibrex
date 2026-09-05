@@ -67,6 +67,10 @@ struct MenuBarContent: View {
     @State private var currentColorTemp: Double = 6500
     @State private var currentBrightness: Double = 0.5
     @State private var lastDeltaE: Double = 0
+    @State private var calibrationDeltaE: Double = 0
+    @State private var calibrationComplete = false
+    @State private var launchAtLogin = false
+    @State private var monthlyRecalibration = false
 
     @StateObject private var displayManager = SystemDisplayManager()
     private let argyllCMS = ArgyllCMS()
@@ -159,8 +163,13 @@ struct MenuBarContent: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CalibrexShowSettings"))) { _ in
             showingSettings = true
         }
-        .sheet(isPresented: $showingSettings) { SettingsSheet() }
-        .sheet(isPresented: $showingCalibrationWizard) { CalibrationWizardSheet() }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CalibrexCalibrationComplete"))) { notification in
+            if let deltaE = notification.userInfo?["deltaE"] as? Double {
+                calibrationDeltaE = deltaE
+            }
+        }
+        .sheet(isPresented: $showingSettings) { SettingsSheet(launchAtLogin: $launchAtLogin, monthlyRecalibration: $monthlyRecalibration) }
+        .sheet(isPresented: $showingCalibrationWizard) { CalibrationWizardSheet(calibrationDeltaE: $calibrationDeltaE) }
     }
 }
 
@@ -185,6 +194,7 @@ struct CalibrationWizardSheet: View {
     @State private var colorimeterDetected = false
     @State private var scanError: String? = nil
     @State private var preCalibrationBaseline: BaselineReport?
+    @Binding var calibrationDeltaE: Double
     
     let argyllCMS = ArgyllCMS()
     let sensor = SensorBridge()
@@ -339,6 +349,12 @@ struct CalibrationWizardSheet: View {
                                             }
 
                                             DispatchQueue.main.async {
+                                                // Notify calibration completion with delta-E
+                                                NotificationCenter.default.post(
+                                                    name: NSNotification.Name("CalibrexCalibrationComplete"),
+                                                    object: nil,
+                                                    userInfo: ["deltaE": post.deltaE]
+                                                )
                                                 telegram.notifyCompletion(report: comparisonReport)
                                                 step = 6
                                             }
@@ -358,8 +374,12 @@ struct CalibrationWizardSheet: View {
                     Text("Verify Calibration").font(.title2)
                     VStack(spacing: 12) {
                         Text("Delta-E:").font(.headline)
-                        Text("1.2").font(.system(size: 40, weight: .bold)).foregroundColor(.green)
-                        Text("Very Good").font(.headline).foregroundColor(.green)
+                        Text("\(String(format: "%.1f", calibrationDeltaE))").font(.system(size: 40, weight: .bold)).foregroundColor(calibrationDeltaE > 0 ? .green : .secondary)
+                        if calibrationDeltaE > 0 {
+                            Text("Good").font(.headline).foregroundColor(.green)
+                        } else {
+                            Text("Pending").font(.headline).foregroundColor(.secondary)
+                        }
                     }.padding().background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.1)))
 
                 case 6: // Complete
@@ -396,13 +416,16 @@ struct CalibrationWizardSheet: View {
 
 struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Binding var launchAtLogin: Bool
+    @Binding var monthlyRecalibration: Bool
+    
     var body: some View {
         VStack {
             HStack { Text("Settings").font(.headline); Spacer(); Button("Done") { dismiss() } }.padding()
             Divider()
             Form {
-                Section("General") { Toggle("Launch at login", isOn: .constant(true)) }
-                Section("Calibration") { Toggle("Monthly recalibration", isOn: .constant(true)) }
+                Section("General") { Toggle("Launch at login", isOn: $launchAtLogin) }
+                Section("Calibration") { Toggle("Monthly recalibration", isOn: $monthlyRecalibration) }
             }.padding()
         }.frame(width: 400, height: 300)
     }

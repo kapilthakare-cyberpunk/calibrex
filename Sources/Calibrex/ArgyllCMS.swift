@@ -158,7 +158,7 @@ class ArgyllCMS {
         // access. `-Y p` skips the "place instrument" wait. dispread has no `-e`
         // flag, so we point it at a throwaway per-display output file.
         let probe = NSTemporaryDirectory() + "calibrex_probe_\(display).ti1"
-        let result = run(toolPath("dispread"), args: [
+        let result = runWithExitCode(toolPath("dispread"), args: [
             "-d\(display)",
             "-c\(port)",
             "-Y", "p",
@@ -167,16 +167,33 @@ class ArgyllCMS {
         ])
         try? FileManager.default.removeItem(atPath: probe)
 
-        if result.contains("Instrument Access Failed") {
+        let output = result.output
+        let success =
+            result.exitCode == 0 &&
+            !output.contains("Instrument Access Failed") &&
+            !output.contains("new_disprd() failed") &&
+            !output.contains("dispread: Error") &&
+            (output.contains("Verifying instrument") || output.contains("Reading") || output.contains("calibrated"))
+
+        if result.exitCode == -1 {
+            // The binary itself could not be launched (missing path, launch permission).
+            print("[ArgyllCMS] ERROR: Unable to launch dispread. Check that ArgyllCMS is installed at \(argyllPath).")
+            return false
+        }
+        if output.contains("Instrument Access Failed") || output.contains("new_disprd() failed") {
             print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission for the application. Please ensure Calibrex has USB access in System Settings → Privacy & Security.")
             return false
         }
-
-        // dispread exits non-zero / reports when it can't open the instrument,
-        // even on a non-fatal read. Look for an explicit access failure message too.
-        if result.contains("new_disprd() failed") || result.contains("Instrument Access Failed") {
+        if result.exitCode != 0 {
+            print("[ArgyllCMS] dispread exited with code \(result.exitCode). Colorimeter not available.")
             return false
         }
+        if !success {
+            print("[ArgyllCMS] dispread ran but did not confirm an instrument. Colorimeter not detected.")
+            return false
+        }
+
+        print("[ArgyllCMS] Colorimeter detected.")
         return true
     }
     
@@ -406,6 +423,14 @@ class ArgyllCMS {
     }
     
     private func run(_ command: String, args: [String]) -> String {
+        return runWithExitCode(command, args: args).output
+    }
+
+    /// Runs an external command and returns both its combined output and exit code.
+    /// The exit code is essential for reliably determining success — many ArgyllCMS
+    /// tools exit non-zero when the instrument is missing even when their stdout/stderr
+    /// does not contain one of the known failure strings.
+    private func runWithExitCode(_ command: String, args: [String]) -> (output: String, exitCode: Int32) {
         let process = Process()
         let outPipe = Pipe()
         let errPipe = Pipe()
@@ -440,10 +465,11 @@ class ArgyllCMS {
 
             let stdout = String(data: outData, encoding: .utf8) ?? ""
             let stderr = String(data: errData, encoding: .utf8) ?? ""
-            return stdout.isEmpty ? stderr : stdout
+            let combined = stdout.isEmpty ? stderr : stdout
+            return (combined, process.terminationStatus)
         } catch {
             print("[ArgyllCMS] Error running \(command): \(error)")
-            return ""
+            return ("", -1)
         }
     }
 }
