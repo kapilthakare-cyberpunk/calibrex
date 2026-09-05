@@ -96,6 +96,7 @@ struct CalibrationWizardSheet: View {
     @State private var scanError: String? = nil
     
     let argyllCMS = ArgyllCMS()
+    let sensor = SensorBridge()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -155,27 +156,60 @@ struct CalibrationWizardSheet: View {
                         }
                     }
                     
-                case 2: // Display
-                    Image(systemName: "display").font(.system(size: 50)).foregroundColor(.accentColor)
-                    Text("Display Selection").font(.title2)
-                    Text("Calibrex will calibrate the current display.").multilineTextAlignment(.center).foregroundColor(.secondary)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Center colorimeter on screen", systemImage: "1.circle")
-                        Label("Ensure no ambient light on lens", systemImage: "2.circle")
-                        Label("Keep display at normal brightness", systemImage: "3.circle")
-                    }.padding()
+                case 2: // Ambient check
+                    Image(systemName: "sun.max.fill").font(.system(size: 50)).foregroundColor(.accentColor)
+                    Text("Ambient Stability Check").font(.title2)
+                    Text("Ensuring your room lighting is stable for a clean calibration.").multilineTextAlignment(.center).foregroundColor(.secondary)
+                    if isScanning {
+                        ProgressView("Checking stability...")
+                    } else if scanError != nil {
+                        Text(scanError!).foregroundColor(.red)
+                    } else if colorimeterDetected {
+                        Button("Verify Stability") {
+                            isScanning = true
+                            scanError = nil
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                let stable = sensor.isStable()
+                                DispatchQueue.main.async {
+                                    isScanning = false
+                                    if stable {
+                                        step = 3
+                                    } else {
+                                        scanError = "Ambient light is unstable. Please dim your lights or close curtains."
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Text("Please scan colorimeter first").foregroundColor(.secondary)
+                    }
                     
-                case 3: // Measurement
+                case 3: // Measurement & Profiling
                     if isMeasuring {
-                        ProgressView(value: progress) { Text("Measuring...") }.progressViewStyle(.linear)
-                        Text("Display will show color patches").foregroundColor(.secondary)
+                        ProgressView(value: progress) { Text("Calibrating...").font(.headline) }.progressViewStyle(.linear)
+                        Text("Please do not move the colorimeter or change lighting.").foregroundColor(.secondary).multilineTextAlignment(.center)
                     } else {
                         Image(systemName: "scope").font(.system(size: 50)).foregroundColor(.accentColor)
-                        Text("Ready to Measure").font(.title2)
-                        Text("Click Start to begin measurement.").multilineTextAlignment(.center).foregroundColor(.secondary)
-                        Button("Start Measurement") { isMeasuring = true; progress = 0; Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-                            progress += 0.02; if progress >= 1.0 { timer.invalidate(); isMeasuring = false; step = 4 }
-                        }}
+                        Text("Ready to Calibrate").font(.title2)
+                        Text("This will measure your display and generate a professional ICC profile.").multilineTextAlignment(.center).foregroundColor(.secondary)
+                        Button("Start Full Process") {
+                            isMeasuring = true
+                            progress = 0
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                let success = argyllCMS.runFullCalibration(profileName: "calibrex_profile.icc") { p in
+                                    DispatchQueue.main.async { progress = p }
+                                }
+                                DispatchQueue.main.async {
+                                    isMeasuring = false
+                                    if success {
+                                        step = 6
+                                    } else {
+                                        scanError = "Calibration failed. Please check the logs."
+                                        step = 3
+                                    }
+                                }
+                            }
+                        }
                     }
                     
                 case 4: // Profile

@@ -208,7 +208,90 @@ class ArgyllCMS {
         return (true, xv, yv, Yv)
     }
     
-    // MARK: - Utility
+    // MARK: - Full Automation Flow
+
+    /// Run a fully automated calibration sequence: init -> measure -> profile -> apply
+    func runFullCalibration(display: Int = 1, profileName: String, progress: (Double) -> Void) -> Bool {
+        print("[ArgyllCMS] Starting fully automated calibration flow...")
+        progress(0.1)
+
+        // Step 1: Pre-initialize the colorimeter
+        guard initializeColorimeter(display: display) else {
+            print("[ArgyllCMS] ERROR: Hardware initialization failed")
+            return false
+        }
+        progress(0.2)
+
+        // Step 2: Measure (dispcal)
+        let calFile = "temp_\(display).cal"
+        print("[ArgyllCMS] Measuring display (dispcal)...")
+        let measureResult = run(toolPath("dispcal"), args: [
+            "-d\(display)",
+            "-v",
+            "-o", calFile
+        ])
+
+        if measureResult.contains("Instrument Access Failed") {
+            print("[ArgyllCMS] ERROR: USB Instrument Access Failed. macOS 26+ requires explicit USB permission.")
+            return false
+        }
+
+        guard measureResult.contains("Done") || !measureResult.contains("Error") else {
+            print("[ArgyllCMS] ERROR: Measurement phase failed")
+            return false
+        }
+        progress(0.6)
+
+        // Step 3: Generate Profile (colprof)
+        print("[ArgyllCMS] Generating ICC profile (colprof)...")
+        let profileResult = run(toolPath("colprof"), args: [
+            "-v",
+            "-a",
+            "-q", "m",
+            calFile,
+            profileName
+        ])
+
+        guard profileResult.contains("Done") || !profileResult.contains("Error") else {
+            print("[ArgyllCMS] ERROR: Profiling phase failed")
+            return false
+        }
+        progress(0.8)
+
+        // Step 4: Apply Profile
+        print("[ArgyllCMS] Applying profile...")
+        guard applyProfile(profilePath: profileName, display: display) else {
+            print("[ArgyllCMS] ERROR: Failed to apply profile")
+            return false
+        }
+        progress(1.0)
+
+        // Step 5: Export Profile
+        print("[ArgyllCMS] Exporting profile...")
+        exportProfile(profilePath: profileName)
+
+        print("[ArgyllCMS] Full calibration flow completed successfully.")
+        return true
+    }
+
+    /// Export the generated ICC profile to the user's Desktop
+    func exportProfile(profilePath: String) -> Bool {
+        let fileManager = FileManager.default
+        let desktopPath = NSString(string: NSHomeDirectory()).appendingPathComponent("Desktop")
+        let destinationURL = URL(fileURLWithPath: desktopPath).appendingPathComponent("calibrex_profile.icc")
+
+        do {
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            try fileManager.copyItem(atPath: profilePath, toPath: destinationURL.path)
+            print("[ArgyllCMS] Profile exported to: \(destinationURL.path)")
+            return true
+        } catch {
+            print("[ArgyllCMS] Error exporting profile: \(error)")
+            return false
+        }
+    }
     
     private func run(_ command: String, args: [String]) -> String {
         let process = Process()
