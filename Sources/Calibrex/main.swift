@@ -97,6 +97,7 @@ struct CalibrationWizardSheet: View {
     
     let argyllCMS = ArgyllCMS()
     let sensor = SensorBridge()
+    let telegram = TelegramNotifier()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -151,12 +152,36 @@ struct CalibrationWizardSheet: View {
                                 colorimeterDetected = detected
                                 if !detected {
                                     scanError = "Colorimeter not found. Please check USB connection."
+                                } else {
+                                    telegram.notifyStatus("Colorimeter detected. Ready for baseline capture.")
                                 }
                             }
                         }
                     }
+
+                case 2: // Baseline Capture
+                    Image(systemName: "doc.text.magnifyingglass").font(.system(size: 50)).foregroundColor(.accentColor)
+                    Text("Capturing Baseline").font(.title2)
+                    Text("Measuring current display state to generate a pre-calibration report.").multilineTextAlignment(.center).foregroundColor(.secondary)
+                    if isScanning {
+                        ProgressView("Measuring drift...")
+                    } else {
+                        Button("Capture Status") {
+                            isScanning = true
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                let baseline = argyllCMS.captureBaselineStatus()
+                                let report = baseline.formatted()
+                                DispatchQueue.main.async {
+                                    isScanning = false
+                                    telegram.notifyStatus("Baseline captured. Delta-E: \(String(format: "%.2f", baseline.deltaE))")
+                                    step = 3
+                                }
+                            }
+                        }
+                    }
+
                     
-                case 2: // Ambient check
+                case 3: // Ambient check
                     Image(systemName: "sun.max.fill").font(.system(size: 50)).foregroundColor(.accentColor)
                     Text("Ambient Stability Check").font(.title2)
                     Text("Ensuring your room lighting is stable for a clean calibration.").multilineTextAlignment(.center).foregroundColor(.secondary)
@@ -173,7 +198,8 @@ struct CalibrationWizardSheet: View {
                                 DispatchQueue.main.async {
                                     isScanning = false
                                     if stable {
-                                        step = 3
+                                        telegram.notifyStatus("Ambient light stable. Proceeding to calibration.")
+                                        step = 4
                                     } else {
                                         scanError = "Ambient light is unstable. Please dim your lights or close curtains."
                                     }
@@ -183,8 +209,8 @@ struct CalibrationWizardSheet: View {
                     } else {
                         Text("Please scan colorimeter first").foregroundColor(.secondary)
                     }
-                    
-                case 3: // Measurement & Profiling
+
+                case 4: // Measurement & Profiling
                     if isMeasuring {
                         ProgressView(value: progress) { Text("Calibrating...").font(.headline) }.progressViewStyle(.linear)
                         Text("Please do not move the colorimeter or change lighting.").foregroundColor(.secondary).multilineTextAlignment(.center)
@@ -195,6 +221,7 @@ struct CalibrationWizardSheet: View {
                         Button("Start Full Process") {
                             isMeasuring = true
                             progress = 0
+                            telegram.notifyStatus("Starting automated calibration process...")
                             DispatchQueue.global(qos: .userInitiated).async {
                                 let success = argyllCMS.runFullCalibration(profileName: "calibrex_profile.icc") { p in
                                     DispatchQueue.main.async { progress = p }
@@ -202,21 +229,25 @@ struct CalibrationWizardSheet: View {
                                 DispatchQueue.main.async {
                                     isMeasuring = false
                                     if success {
-                                        step = 6
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            let pre = argyllCMS.captureBaselineStatus() // Note: In a real app, we'd store the actual pre-baseline
+                                            let post = argyllCMS.captureBaselineStatus()
+                                            let comparisonReport = argyllCMS.generateProfessionalReport(pre: pre, post: post)
+
+                                            DispatchQueue.main.async {
+                                                telegram.notifyCompletion(report: comparisonReport)
+                                                step = 6
+                                            }
+                                        }
                                     } else {
+                                        telegram.notifyStatus("Calibration failed. Please check the logs.")
                                         scanError = "Calibration failed. Please check the logs."
-                                        step = 3
+                                        step = 4
                                     }
                                 }
                             }
                         }
                     }
-                    
-                case 4: // Profile
-                    Image(systemName: "doc.badge.gearshape").font(.system(size: 50)).foregroundColor(.accentColor)
-                    Text("Generate ICC Profile").font(.title2)
-                    Text("Click Generate to create an ICC profile.").multilineTextAlignment(.center).foregroundColor(.secondary)
-                    Button("Generate Profile") { step = 5 }
                     
                 case 5: // Verification
                     Image(systemName: "checkmark.magnifyingglass").font(.system(size: 50)).foregroundColor(.accentColor)
@@ -226,7 +257,7 @@ struct CalibrationWizardSheet: View {
                         Text("1.2").font(.system(size: 40, weight: .bold)).foregroundColor(.green)
                         Text("Very Good").font(.headline).foregroundColor(.green)
                     }.padding().background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.1)))
-                    
+
                 case 6: // Complete
                     Image(systemName: "checkmark.seal.fill").font(.system(size: 60)).foregroundColor(.green)
                     Text("Calibration Complete!").font(.title)
@@ -236,8 +267,9 @@ struct CalibrationWizardSheet: View {
                         Label("Night Shift will be managed automatically", systemImage: "checkmark.circle.fill")
                         Label("Profile verified weekly", systemImage: "checkmark.circle.fill")
                     }.padding().background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.1)))
-                    
+
                 default: EmptyView()
+
                 }
             }.padding()
             

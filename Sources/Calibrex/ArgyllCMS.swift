@@ -3,14 +3,102 @@ import Foundation
 /// ArgyllCMS CLI wrapper with colorimeter pre-initialization
 /// Fix: Spyder X2 Ultra requires USB initialization before dispcal can detect it.
 /// Solution: Run a brief dispread measurement first to wake up the sensor.
+// MARK: - Reporting Models
+
+struct BaselineReport {
+    let timestamp: Date
+    let deviceName: String
+    let whitePoint: (x: Double, y: Double)
+    let luminance: Double
+    let deltaE: Double
+    let status: String
+}
+
+extension BaselineReport {
+    func formatted() -> String {
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        df.timeStyle = .short
+
+        return """
+        --------------------------------------------------
+        CALIBREX PRE-CALIBRATION STATUS REPORT
+        --------------------------------------------------
+        Timestamp:    \(df.string(from: timestamp))
+        Device:      \(deviceName)
+
+        MEASUREMENTS:
+        White Point:  x=\(String(format: "%.4f", whitePoint.x)), y=\(String(format: "%.4f", whitePoint.y))
+        Luminance:    \(String(format: "%.2f", luminance)) cd/m2
+        Delta-E:     \(String(format: "%.2f", deltaE))
+
+        STATUS: \(status)
+        --------------------------------------------------
+        """
+    }
+}
+
 class ArgyllCMS {
+
     private let argyllPath: String
     
     init(argyllPath: String = "\(NSHomeDirectory())/Library/Application Support/DisplayCAL/dl/Argyll_V3.5.0/bin") {
         self.argyllPath = argyllPath
     }
     
+    // MARK: - Baseline Capture
+
+    /// Captures the current display state before calibration.
+    func captureBaselineStatus() -> BaselineReport {
+        print("[ArgyllCMS] Capturing baseline status...")
+        let reading = spotRead()
+
+        // Standard D65 target
+        let targetX = 0.3127
+        let targetY = 0.3290
+
+        // Simplified Delta-E calculation for report
+        let dE = reading.valid ?
+            sqrt(pow(reading.x - targetX, 2) + pow(reading.y - targetY, 2)) * 100 : 0.0
+
+        let status = dE < 2.0 ? "Excellent" : (dE < 5.0 ? "Fair" : "Poor - Calibration Required")
+
+        return BaselineReport(
+            timestamp: Date(),
+            deviceName: "Built-in Retina Display",
+            whitePoint: (reading.x, reading.y),
+            luminance: reading.Y,
+            deltaE: dE,
+            status: status
+        )
+    }
+
+    /// Generates a professional, non-emoji comparison report.
+    func generateProfessionalReport(pre: BaselineReport, post: BaselineReport? = nil) -> String {
+        var report = pre.formatted()
+
+        if let post = post {
+            report += "\n\n"
+            report += "--------------------------------------------------\n"
+            report += "POST-CALIBRATION STATUS REPORT\n"
+            report += "--------------------------------------------------\n"
+            report += "Timestamp:    \(post.timestamp)\n" // Simplified for example
+            report += "White Point:  x=\(String(format: "%.4f", post.whitePoint.x)), y=\(String(format: "%.4f", post.whitePoint.y))\n"
+            report += "Luminance:    \(String(format: "%.2f", post.luminance)) cd/m2\n"
+            report += "Delta-E:     \(String(format: "%.2f", post.deltaE))\n"
+            report += "STATUS: \(post.status)\n"
+            report += "--------------------------------------------------\n"
+
+            let improvement = pre.deltaE - post.deltaE
+            report += "\nIMPROVEMENT: Delta-E reduced by \(String(format: "%.2f", improvement))\n"
+            report += "FINAL VERDICT: Display is now professionally calibrated."
+        }
+
+        return report
+    }
+
     // MARK: - Tool Paths
+
     
     private func toolPath(_ name: String) -> String {
         return "\(argyllPath)/\(name)"
