@@ -5,18 +5,56 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
     }
+
+    /// Opens the system Settings to the Night Shift preferences pane.
+    func openNightShiftSettings() {
+        if #available(macOS 13.0, *) {
+            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.displays?NightShift")!)
+        }
+    }
+
+    /// Opens the system Settings to the Displays preferences pane (for True Tone).
+    func openTrueToneSettings() {
+        if #available(macOS 13.0, *) {
+            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.displays")!)
+        }
+    }
 }
 
 @main
 struct CalibrexApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
         MenuBarExtra {
             MenuBarContent()
         } label: {
-            Image(systemName: "circle.lefthalf.filled")
+            Label("Calibrex", systemImage: "circle.lefthalf.filled")
         }.menuBarExtraStyle(.window)
     }
+
+    var commands: some Commands {
+        CommandMenu("Calibrex") {
+            Button("Calibrate Now…") {
+                NSApp.activate(ignoringOtherApps: true)
+                PostNotification(name: NSNotification.Name("CalibrexShowWizard"))
+            }
+            Button("Preferences…") {
+                NSApp.activate(ignoringOtherApps: true)
+                PostNotification(name: NSNotification.Name("CalibrexShowSettings"))
+            }
+            Divider()
+            Button("Quit Calibrex") {
+                NSApp.terminate(nil)
+            }
+            .keyboardShortcut("q", modifiers: [.command])
+        }
+    }
+}
+
+/// Posts a notification that the menu bar content can observe.
+private func PostNotification(name: NSNotification.Name) {
+    NotificationCenter.default.post(name: name, object: nil)
 }
 
 struct MenuBarContent: View {
@@ -114,6 +152,12 @@ struct MenuBarContent: View {
         }.padding().frame(width: 280)
         .onAppear {
             nightShiftEnabled = displayManager.isNightShiftEnabled()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CalibrexShowWizard"))) { _ in
+            showingCalibrationWizard = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CalibrexShowSettings"))) { _ in
+            showingSettings = true
         }
         .sheet(isPresented: $showingSettings) { SettingsSheet() }
         .sheet(isPresented: $showingCalibrationWizard) { CalibrationWizardSheet() }
